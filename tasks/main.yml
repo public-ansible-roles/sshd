@@ -1,26 +1,30 @@
 ---
-- name: disable Password Authentication
+- name: "sshd | disable Password Authentication"
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^PasswordAuthentication"
     insertafter: "^#PasswordAuthentication"
     line: "PasswordAuthentication no"
+  register: result_disable_pass_auth
 
-- name: disable Challenge Response Authentication
+- name: "sshd | disable Challenge Response Authentication"
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^ChallengeResponseAuthentication"
     insertafter: "^#ChallengeResponseAuthentication"
     line: "ChallengeResponseAuthentication no"
+  register: result_disable_cha_res_auth
 
-- name: Profibit RootLogin
+- name: "sshd | Profibit RootLogin"
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^PermitRootLogin"
     insertafter: "^#PermitRootLogin"
     line: "PermitRootLogin no"
+  register: result_profibit_root
 
-- name: restart sshd.service
+- name: "sshd | restart sshd.service"
   service:
     name: sshd
     state: restarted
+  when: result_disable_pass_auth is changed or result_disable_cha_res_auth is changed or result_profibit_root is changed
